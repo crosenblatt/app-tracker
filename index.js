@@ -17,6 +17,10 @@ app.get('/api/helloworld', (req, res) => {
     res.send({"message": "hello world"})
 })
 
+app.get('/api/goodbyeworld', (req, res) => {
+    res.send({"message": "goodbye world"})
+})
+
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname + '/client/build/index.html'))
 })
