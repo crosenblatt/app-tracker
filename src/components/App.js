@@ -4,13 +4,8 @@ import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom'
 import MyApps from './MyApplications.js'
 import Register from './Register.js'
 import Login from './Login';
-import { AuthContext } from '../context/auth';
-import PrivateRoute from '../PrivateRoute';
 
 class App extends React.Component {
-
-  authTokens = null;
-  setAuthTokens = null;
 
   constructor(props) {
     super(props)

@@ -12,7 +12,7 @@ app.use(morgan('combined'))
 
 
 app.get('/api/helloworld', (req, res) => {
-    res.send("Hello World!")
+    res.send({"message": "hello world"})
 })
 
 app.listen(8080, () => {
