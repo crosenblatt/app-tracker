@@ -1,11 +1,6 @@
 -- *************** SqlDBM: PostgreSQL ****************;
 -- ***************************************************;
 
-CREATE DATABASE APP_TRACKER;
-
-\connect app_tracker;
-
-
 CREATE TABLE USERS
 (
  user_id  serial NOT NULL,
