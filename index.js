@@ -26,6 +26,36 @@ app.get('/api/users', async (req, res) => {
     })
 })
 
+app.get('/api/apps', async(req, res) => {
+    const client = await pool.connect()
+    client.query('SELECT * FROM APPLIED_TO WHERE user_id = 1', (error, results) => {
+        if(error) {
+            throw error
+        }
+
+        res.json(results.rows)
+        client.release()
+    })
+})
+
+app.post('/api/apps', async(req, res) => {
+    const client = await pool.connect()
+    client.query("INSERT INTO APPLIED_TO (company_name, last_updated, stage, resume, user_id, recruiter, recruiter_email) VALUES ($1, $2, $3, $4, 1, $5, $6)", 
+    [req.body.company_name, req.body.last_updated, req.body.stage, req.body.resume, req.body.recruiter, req.body.recruiter_email],
+    (error, results) => {
+        if(error) {
+            console.log(error)
+            res.sendStatus(500)
+        } else if(results.rowCount == 1)  {
+            res.sendStatus(201)
+        } else {
+            res.sendStatus(400)
+        }
+
+        client.release()
+    })
+})
+
 app.get('/api/helloworld', (req, res) => {
     res.send({"message": "hello world"})
 })
