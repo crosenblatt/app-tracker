@@ -4,6 +4,7 @@ const cors = require('cors')
 const helmet = require('helmet')
 const morgan = require('morgan')
 const path = require('path')
+const {pool} = require('./config')
 
 const app = express()
 app.use(helmet())
@@ -12,6 +13,18 @@ app.use(cors())
 app.use(morgan('combined'))
 
 app.use(express.static(path.join(__dirname, 'client/build')))
+
+
+app.get('/api/users', async (req, res) => {
+    const client = await pool.connect()
+    client.query('SELECT * FROM USERS', (error, results) => {
+        if(error) {
+            throw error
+        }
+        res.json(results.rows)
+        client.release()
+    })
+})
 
 app.get('/api/helloworld', (req, res) => {
     res.send({"message": "hello world"})

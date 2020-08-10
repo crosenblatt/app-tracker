@@ -14,6 +14,12 @@ class MyApps extends React.Component {
                 this.setState({message: data["message"]})
             })
             .catch(console.log)
+        fetch('/api/users')
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+            })
+            .catch(console.log)
     }
 
     render() {
