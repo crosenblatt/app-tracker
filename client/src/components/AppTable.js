@@ -1,5 +1,5 @@
 import React from 'react'
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell';
@@ -7,7 +7,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom'
 
 const styles = theme => ({
     table: {
@@ -21,11 +21,7 @@ class AppTable extends React.Component {
         super(props)
         this.state = { 
             userId: props.userId, 
-            rows: []
-                // this.createData('Sumo Logic', 'August 9', 'Onsite', 'Summer 2020', 'Kat Creamer', 'idk@sumologic.com'),
-                // this.createData('iCims', 'August 5', 'Accepted', 'Summer 2019', 'Sara Palughi', 'idk@icims.com'),
-                // this.createData('Microsoft', 'July 4', 'Rejected', 'Fall 2019', 'Melissa Fackelmann', 'melissa@microsoft.com'),
-                // this.createData('blah', 'blah', 'blah', 'blah', 'blah', 'blah')] 
+            rows: [],
         }
         this.classes = props.classes
         this.addData = this.addData.bind(this)
@@ -35,51 +31,21 @@ class AppTable extends React.Component {
         fetch('/api/apps')
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 data.map((row) => {
-                    console.log(row)
-                    this.addData(row["company_name"], row["last_updated"], row["stage"], "resume", row["recruiter"], row["recruiter_email"])
+                    this.addData(row["company_name"], row["last_updated"], row["stage"], "resume", row["recruiter"], row["recruiter_email"], row["application_id"])
                 })
             })
+        }
+
+    createData(companyName, lastUpdated, stage, resume, recruiter, recruiterEmail, applicationId) {
+        return { companyName, lastUpdated, stage, resume, recruiter, recruiterEmail, applicationId }
     }
 
-    createData(companyName, lastUpdated, stage, resume, recruiter, recruiterEmail) {
-        return { companyName, lastUpdated, stage, resume, recruiter, recruiterEmail }
-    }
-
-    addData = (companyName, lastUpdated, stage, resume, recruiter, recruiterEmail) => {
+    addData = (companyName, lastUpdated, stage, resume, recruiter, recruiterEmail, applicationId) => {
         this.setState((prevState, props) =>{
-            const newRow = this.createData(companyName, lastUpdated, stage, resume, recruiter, recruiterEmail)
+            const newRow = this.createData(companyName, lastUpdated, stage, resume, recruiter, recruiterEmail, applicationId)
             return { userId: prevState.userId, rows: [...prevState.rows, newRow] }
         })
-    }
-
-    newApp = (companyName, lastUpdated, stage, resume, recruiter, recruiterEmail) => {
-        fetch('/api/apps', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify(this.newData(companyName, lastUpdated, stage, resume, recruiter, recruiterEmail))
-        }).then(res => {
-            if(res.ok) {
-                this.addData(companyName, lastUpdated, stage, resume, recruiter, recruiterEmail)
-            } else {
-                console.log(res)
-                alert("Failed to add application")
-            }
-        })
-    }
-
-    newData(companyName, lastUpdated, stage, resume, recruiter, recruiterEmail) {
-        return {
-            "company_name": companyName,
-            "last_updated": lastUpdated,
-            "stage": stage,
-            "resume": resume,
-            "recruiter": recruiter,
-            "recruiter_email": recruiterEmail
-        }
     }
 
     render() {
@@ -103,7 +69,6 @@ class AppTable extends React.Component {
 
         return (
             <div>
-                <Button variant = "contained" onClick = {() => this.newApp('hellopls', '08-10-2020', 'blah', 'blah', 'blah', 'blah')}>Add New Application</Button>
                 <TableContainer component = {Paper}>
                     <Table className = {this.classes.table} aria-label = "Applications Table">
                         <TableHead>
@@ -114,6 +79,7 @@ class AppTable extends React.Component {
                                 <Cell align = "right">Recruiter</Cell>
                                 <Cell align = "right">Recruiter Email</Cell>
                                 <Cell align = "right">Last Updated</Cell>
+                                <Cell align = "right">Edit</Cell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -127,6 +93,12 @@ class AppTable extends React.Component {
                                     <Cell align = "right">{row.recruiter}</Cell>
                                     <Cell align = "right">{row.recruiterEmail}</Cell>
                                     <Cell align = "right">{row.lastUpdated}</Cell>
+                                    <Cell align = "right">
+                                        <Link to = {{ 
+                                            pathname: "/appForm",
+                                            state: { applicationId: row.applicationId }
+                                        }} >Edit this Application</Link>
+                                    </Cell>
                                 </Row>
                             ))}
                         </TableBody>
