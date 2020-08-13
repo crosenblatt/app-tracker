@@ -23,6 +23,7 @@ class AppForm extends React.Component {
         }
         this.handleInputChange = this.handleInputChange.bind(this)
         this.handleDateInputChange = this.handleDateInputChange.bind(this)
+        this.updateApp = this.updateApp.bind(this)
     }
 
     componentDidMount() {
@@ -35,7 +36,7 @@ class AppForm extends React.Component {
                         console.log(row)
                         this.setState({
                             companyName: row["company_name"],
-                            lastUpdated: row["last_updated"],
+                            lastUpdated: new Date(row["last_updated"]),
                             stage: row["stage"],
                             resume: "resume",
                             recruiter: row["recruiter"],
@@ -71,7 +72,7 @@ class AppForm extends React.Component {
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'
                 },
-                body: JSON.stringify(this.newData(this.state.companyName, this.state.lastUpdated, this.state.stage, this.state.resume, this.state.recruiter, this.state.recruiterEmail))
+                body: JSON.stringify(this.newData(this.state.companyName, this.state.lastUpdated, this.state.stage, this.state.resume, this.state.recruiter, this.state.recruiterEmail, -1))
             }).then(res => {
                 if(res.ok) {
                     alert(this.state.companyName + " Added")
@@ -91,14 +92,47 @@ class AppForm extends React.Component {
         }
     }
 
-    newData(companyName, lastUpdated, stage, resume, recruiter, recruiterEmail) {
+    updateApp = (event) => {
+        event.preventDefault()
+        if(this.state.companyName === "" || this.state.lastUpdated === "" || this.state.stage === "" || this.state.resume === "" || this.state.recruiter === "" || this.state.recruiterEmail === "") {
+            alert("All fields must be filled out before submission")
+        } else if(this.state.applicationId === "") {
+            alert("No application specified to update")
+        } else {
+            fetch('/api/apps/' + this.state.applicationId, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8'
+                },
+                body: JSON.stringify(this.newData(this.state.companyName, this.state.lastUpdated, this.state.stage, this.state.resume, this.state.recruiter, this.state.recruiterEmail, this.state.applicationId))
+            }).then(res => {
+                if(res.ok) {
+                    alert(this.state.companyName + " Updated")
+                    this.setState({
+                        companyName: "",
+                        lastUpdated: new Date(),
+                        stage: "",
+                        resume: "",
+                        recruiter: "",
+                        recruiterEmail: "",
+                        applicationId: ""
+                    })
+                } else {
+                    alert("Failed to update application")
+                }
+            })
+        }
+    }
+
+    newData(companyName, lastUpdated, stage, resume, recruiter, recruiterEmail, applicationId) {
         return {
             "company_name": companyName,
             "last_updated": lastUpdated,
             "stage": stage,
             "resume": resume,
             "recruiter": recruiter,
-            "recruiter_email": recruiterEmail
+            "recruiter_email": recruiterEmail,
+            "application_id" : applicationId
         }
     }
 
@@ -113,6 +147,7 @@ class AppForm extends React.Component {
                             type = "text"
                             value = {this.state.companyName}
                             onChange = {this.handleInputChange}
+                            required
                         />
                     </label>
                     <br />
@@ -131,6 +166,7 @@ class AppForm extends React.Component {
                             type = "text"
                             value = {this.state.stage}
                             onChange = {this.handleInputChange}
+                            required
                         />
                     </label>
                     <br />
@@ -141,6 +177,7 @@ class AppForm extends React.Component {
                             type = "text"
                             value = {this.state.resume}
                             onChange = {this.handleInputChange}
+                            required
                         />
                     </label>
                     <br />
@@ -151,6 +188,7 @@ class AppForm extends React.Component {
                             type = "text"
                             value = {this.state.recruiter}
                             onChange = {this.handleInputChange}
+                            required
                         />
                     </label>
                     <br />
@@ -161,10 +199,12 @@ class AppForm extends React.Component {
                             type = "text"
                             value = {this.state.recruiterEmail}
                             onChange = {this.handleInputChange}
+                            required
                         />
                     </label>
                     <br />
                     <input type = "submit"/>
+                    <button onClick = {this.updateApp} disabled = {this.state.applicationId === ""}>Update</button>
                 </form>
             </div>
         )

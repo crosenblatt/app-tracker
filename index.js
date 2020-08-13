@@ -72,7 +72,7 @@ app.post('/api/apps', async(req, res) => {
 
 app.patch('/api/apps/:application_id', async(req, res) => {
     const client = await pool.connect()
-    client.query("UPDATE APPLIED_TO SET company_name = $1, last_updated = $2, stage = $3, recruiter = $4, recruiter_email = $5 WHERE application_id = $6"),
+    client.query("UPDATE APPLIED_TO SET company_name = $1, last_updated = $2, stage = $3, recruiter = $4, recruiter_email = $5 WHERE application_id = $6",
     [req.body.company_name, req.body.last_updated, req.body.stage, req.body.recruiter, req.body.recruiter_email, req.params.application_id],
     (error, results) => {
         if(error) {
@@ -85,7 +85,7 @@ app.patch('/api/apps/:application_id', async(req, res) => {
         }
 
         client.release()
-    }
+    })
 })
 
 app.get("*", (req, res) => {
