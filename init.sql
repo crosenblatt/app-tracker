@@ -8,6 +8,7 @@ CREATE TABLE USERS
  password varchar(50) NOT NULL,
  email    varchar(50) NOT NULL,
  name     varchar(50) NOT NULL,
+ token    varchar(500) NOT NULL,
  CONSTRAINT PK_users PRIMARY KEY ( user_id )
 );
 

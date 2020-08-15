@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom'
+import Cookies from 'js-cookie'
 
 const styles = theme => ({
     table: {
@@ -28,8 +29,12 @@ class AppTable extends React.Component {
     }
 
     componentDidMount() {
-        fetch('/api/apps')
-            .then(res => res.json())
+        fetch('/api/apps', {
+            method: 'GET',
+            headers: {
+                'Authorization': "Bearer " + Cookies.get('token')
+            }
+        }).then(res => res.json())
             .then(data => {
                 data.map((row) => {
                     this.addData(row["company_name"], row["last_updated"], row["stage"], "resume", row["recruiter"], row["recruiter_email"], row["application_id"])
