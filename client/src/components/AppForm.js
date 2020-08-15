@@ -29,8 +29,12 @@ class AppForm extends React.Component {
 
     componentDidMount() {
         if(this.state.applicationId != "") {
-            fetch('/api/apps/' + this.state.applicationId)
-                .then(res => res.json())
+            fetch('/api/apps/' + this.state.applicationId, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + Cookies.get('token')
+                }
+            }).then(res => res.json())
                 .then(data => {
                     data.map((row) => {
                         console.log(row)
@@ -103,7 +107,8 @@ class AppForm extends React.Component {
             fetch('/api/apps/' + this.state.applicationId, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json; charset=utf-8'
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Authorization': 'Bearer ' + Cookies.get('token')
                 },
                 body: JSON.stringify(this.newData(this.state.companyName, this.state.lastUpdated, this.state.stage, this.state.resume, this.state.recruiter, this.state.recruiterEmail, this.state.applicationId))
             }).then(res => {

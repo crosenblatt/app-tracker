@@ -78,10 +78,10 @@ app.get('/api/apps', authenticateToken, async(req, res) => {
     })
 })
 
-app.get('/api/apps/:application_id', async(req, res) => {
+app.get('/api/apps/:application_id', authenticateToken, async(req, res) => {
     const client = await pool.connect()
-    client.query('SELECT * FROM APPLIED_TO WHERE application_id = $1', 
-    [req.params.application_id],
+    client.query('SELECT * FROM APPLIED_TO WHERE application_id = $1 AND username = $2', 
+    [req.params.application_id, req.user.username],
     (error, result) => {
         if(error) {
             res.sendStatus(500)
@@ -110,10 +110,10 @@ app.post('/api/apps', authenticateToken, async(req, res) => {
     })
 })
 
-app.patch('/api/apps/:application_id', async(req, res) => {
+app.patch('/api/apps/:application_id', authenticateToken, async(req, res) => {
     const client = await pool.connect()
-    client.query("UPDATE APPLIED_TO SET company_name = $1, last_updated = $2, stage = $3, recruiter = $4, recruiter_email = $5 WHERE application_id = $6",
-    [req.body.company_name, req.body.last_updated, req.body.stage, req.body.recruiter, req.body.recruiter_email, req.params.application_id],
+    client.query("UPDATE APPLIED_TO SET company_name = $1, last_updated = $2, stage = $3, recruiter = $4, recruiter_email = $5 WHERE application_id = $6 AND username = $7",
+    [req.body.company_name, req.body.last_updated, req.body.stage, req.body.recruiter, req.body.recruiter_email, req.params.application_id, req.user.username],
     (error, results) => {
         if(error) {
             console.log(error)
