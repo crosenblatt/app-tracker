@@ -34,20 +34,24 @@ class AppForm extends React.Component {
                 headers: {
                     'Authorization': 'Bearer ' + Cookies.get('token')
                 }
-            }).then(res => res.json())
-                .then(data => {
-                    data.map((row) => {
-                        console.log(row)
-                        this.setState({
-                            companyName: row["company_name"],
-                            lastUpdated: new Date(row["last_updated"]),
-                            stage: row["stage"],
-                            resume: "resume",
-                            recruiter: row["recruiter"],
-                            recruiterEmail: row["recruiter_email"]
+            }).then(res => { 
+                if(res.ok) {
+                    res.json()
+                    .then(data => {
+                        data.map((row) => {
+                            console.log(row)
+                            this.setState({
+                                companyName: row["company_name"],
+                                lastUpdated: new Date(row["last_updated"]),
+                                stage: row["stage"],
+                                resume: "resume",
+                                recruiter: row["recruiter"],
+                                recruiterEmail: row["recruiter_email"]
+                            })
                         })
                     })
-                })
+                }
+            })
         }
     }
 

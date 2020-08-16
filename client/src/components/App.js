@@ -4,11 +4,17 @@ import MyApps from './MyApplications.js'
 import Register from './Register.js'
 import Login from './Login.js';
 import AppForm from './AppForm.js'
+import { Button } from '@material-ui/core';
+import history from '../context/history.js'
 
 class App extends React.Component {
 
   constructor(props) {
     super(props)
+  }
+
+  logout = (event) => {
+    document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
   }
 
   render() {
@@ -31,6 +37,9 @@ class App extends React.Component {
               </li>
               <li>
                 <Link to="/appForm">Add an Application</Link>
+              </li>
+              <li>
+                <Link to="/login" onClick = {this.logout}>Log Out</Link>
               </li>
             </ul>
           </nav>

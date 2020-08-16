@@ -53,6 +53,24 @@ app.post('/api/register', async(req, res) => {
     })
 })
 
+app.post('/api/login', async(req, res) => {
+    const client = await pool.connect()
+    client.query(`SELECT * FROM USERS WHERE username = $1 AND password = crypt($2, password);`,
+    [req.body.username, req.body.password],
+    (error, results) => {
+        if(error) {
+            res.sendStatus(500)
+        } else if(results.rowCount == 1) {
+            const token = generateAccessToken({ username: req.body.username })
+            res.json(token)
+        } else {
+            res.sendStatus(401)
+        }
+
+        client.release()
+    })
+})
+
 app.get('/api/users', async (req, res) => {
     const client = await pool.connect()
     client.query('SELECT * FROM USERS', (error, results) => {
