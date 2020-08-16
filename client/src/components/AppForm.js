@@ -1,6 +1,7 @@
 import React from 'react'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import Cookies from 'js-cookie'
 
 class AppForm extends React.Component {
     constructor(props) {
@@ -28,22 +29,29 @@ class AppForm extends React.Component {
 
     componentDidMount() {
         if(this.state.applicationId != "") {
-            console.log("fetching")
-            fetch('/api/apps/' + this.state.applicationId)
-                .then(res => res.json())
-                .then(data => {
-                    data.map((row) => {
-                        console.log(row)
-                        this.setState({
-                            companyName: row["company_name"],
-                            lastUpdated: new Date(row["last_updated"]),
-                            stage: row["stage"],
-                            resume: "resume",
-                            recruiter: row["recruiter"],
-                            recruiterEmail: row["recruiter_email"]
+            fetch('/api/apps/' + this.state.applicationId, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + Cookies.get('token')
+                }
+            }).then(res => { 
+                if(res.ok) {
+                    res.json()
+                    .then(data => {
+                        data.map((row) => {
+                            console.log(row)
+                            this.setState({
+                                companyName: row["company_name"],
+                                lastUpdated: new Date(row["last_updated"]),
+                                stage: row["stage"],
+                                resume: "resume",
+                                recruiter: row["recruiter"],
+                                recruiterEmail: row["recruiter_email"]
+                            })
                         })
                     })
-                })
+                }
+            })
         }
     }
 
@@ -70,7 +78,8 @@ class AppForm extends React.Component {
             fetch('/api/apps', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json;charset=utf-8'
+                    'Content-Type': 'application/json;charset=utf-8',
+                    'Authorization': 'Bearer ' + Cookies.get('token')
                 },
                 body: JSON.stringify(this.newData(this.state.companyName, this.state.lastUpdated, this.state.stage, this.state.resume, this.state.recruiter, this.state.recruiterEmail, -1))
             }).then(res => {
@@ -102,7 +111,8 @@ class AppForm extends React.Component {
             fetch('/api/apps/' + this.state.applicationId, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json; charset=utf-8'
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Authorization': 'Bearer ' + Cookies.get('token')
                 },
                 body: JSON.stringify(this.newData(this.state.companyName, this.state.lastUpdated, this.state.stage, this.state.resume, this.state.recruiter, this.state.recruiterEmail, this.state.applicationId))
             }).then(res => {
